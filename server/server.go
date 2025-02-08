@@ -7,7 +7,7 @@ import (
 	"unicode"
 )
 
-func PostUser(w http.ResponseWriter, r *http.Request, db *Database) {
+func PostStudent(w http.ResponseWriter, r *http.Request, db *Database) {
 	var student Student
 	err := json.NewDecoder(r.Body).Decode(&student)
 
@@ -46,7 +46,7 @@ func PostUser(w http.ResponseWriter, r *http.Request, db *Database) {
 	}
 
 	response := map[string]interface{}{
-		"message": "User created successfully",
+		"message": "Student created successfully",
 		"user": map[string]string{
 			"Student ID":   student.StudentID,
 			"Student Name": student.StudentName,
@@ -56,5 +56,29 @@ func PostUser(w http.ResponseWriter, r *http.Request, db *Database) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(response)
+}
+
+func GetAllStudents(w http.ResponseWriter, r *http.Request, db *Database) {
+	students, err := db.GetAllStudents()
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	responseJSON, err := json.Marshal(students)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	response := map[string]interface{}{
+		"message": "User created successfully",
+		"users":   json.RawMessage(responseJSON),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }

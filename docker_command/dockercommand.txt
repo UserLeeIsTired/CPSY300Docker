@@ -1,0 +1,22 @@
+-- to store database
+
+docker exec -t postgres_container pg_dumpall -c -U postgres > dump_1.sql
+
+
+-- drop database
+docker exec <postgres_container_name> psql -U <your_postgres_user> -c 'DROP DATABASE <your_db_name>'
+
+docker exec postgres_container psql -U postgres -c 'DROP DATABASE docker_db' 
+
+-- to restore database
+
+cat <file.sql> | docker exec -i <container name> psql -U <username>
+
+cat dump_1.sql | docker exec -i postgres_container psql -U postgres
+
+
+-- connect to database with bash
+
+docker exec -ti <postgres_container_name> psql -U <your_postgres_user>
+
+docker exec -ti postgres_container psql -U postgres

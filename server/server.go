@@ -74,7 +74,31 @@ func GetAllStudents(w http.ResponseWriter, r *http.Request, db *Database) {
 	}
 
 	response := map[string]interface{}{
-		"message": "User created successfully",
+		"message": "Students retrieved successfully",
+		"users":   json.RawMessage(responseJSON),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
+func GetStudentByID(w http.ResponseWriter, r *http.Request, db *Database, id string) {
+	student, err := db.GetStudentByID(id)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	responseJSON, err := json.Marshal(student)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	response := map[string]interface{}{
+		"message": "Student retrieved successfully",
 		"users":   json.RawMessage(responseJSON),
 	}
 

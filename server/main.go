@@ -21,8 +21,13 @@ func main() {
 		PostStudent(w, r, db)
 	})
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/students", func(w http.ResponseWriter, r *http.Request) {
 		GetAllStudents(w, r, db)
+	})
+
+	r.Get("/students/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := chi.URLParam(r, "id")
+		GetStudentByID(w, r, db, id)
 	})
 
 	http.ListenAndServe(":3000", r)

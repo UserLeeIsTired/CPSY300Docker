@@ -17,6 +17,10 @@ func main() {
 
 	r := chi.NewRouter()
 
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, World!!")
+	})
+
 	r.Post("/students", func(w http.ResponseWriter, r *http.Request) {
 		PostStudent(w, r, db)
 	})
@@ -30,6 +34,6 @@ func main() {
 		GetStudentByID(w, r, db, id)
 	})
 
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe("0.0.0.0:3000", r)
 
 }

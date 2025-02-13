@@ -33,7 +33,6 @@ func NewDatabase() (*Database, error) {
 		password = os.Getenv("PASSWORD")
 		dbname   = os.Getenv("DBNAME")
 	)
-
 	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, dbname)
 
 	db, err := sql.Open("postgres", connectionString)

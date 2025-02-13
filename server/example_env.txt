@@ -1,0 +1,5 @@
+HOST = "postgresql_database"
+PORT = 5432
+USER = "postgres"
+PASSWORD = "password"
+DBNAME = "docker_db"

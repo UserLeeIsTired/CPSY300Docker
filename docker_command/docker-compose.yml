@@ -27,5 +27,5 @@ services:
         container_name: my-docker-server
         image: my-docker-server:latest
         ports:
-            - "3000:3000"
+            - "8080:8080"
         restart: always

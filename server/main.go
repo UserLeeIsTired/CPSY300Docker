@@ -34,6 +34,6 @@ func main() {
 		GetStudentByID(w, r, db, id)
 	})
 
-	http.ListenAndServe("0.0.0.0:3000", r)
+	http.ListenAndServe("0.0.0.0:8080", r)
 
 }

@@ -41,7 +41,7 @@ func PostStudent(w http.ResponseWriter, r *http.Request, db *Database) {
 	_, err = db.CreateStudent(student.StudentID, student.StudentName, student.Course)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusConflict)
 		return
 	}
 

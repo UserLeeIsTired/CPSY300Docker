@@ -1,0 +1,33 @@
+-- to store database
+
+docker exec -t postgres_container pg_dumpall -c -U postgres > dump_1.sql
+
+
+-- drop database
+docker exec <postgres_container_name> psql -U <your_postgres_user> -c 'DROP DATABASE <your_db_name>'
+
+docker exec postgres_container psql -U postgres -c 'DROP DATABASE docker_db' 
+
+-- to restore database
+
+cat <file.sql> | docker exec -i <container name> psql -U <username>
+
+cat dump_1.sql | docker exec -i postgres_container psql -U postgres
+
+
+-- connect to database with bash
+
+docker exec -ti <postgres_container_name> psql -U <your_postgres_user>
+
+docker exec -ti postgres_docker_assignment_container psql -U postgres
+
+docker run -d -p 8080:8080 --network docker-assignment-network --name docker-server-1 my-docker-server:latest
+docker run -d -p 8081:8081 --network docker-assignment-network --name docker-server-2 my-docker-server2:latest
+docker run -d -p 5431:5432 --network docker-assignment-network --name postgres_docker_assignment_3_container -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -e POSTGRES_DB=docker_db postgres:latest
+
+--change priority command
+sudo renice -n 5 -p <PID>
+--check priority command
+ps -p <PID> -o rtprio,ni,pri,cmd
+--check cpu
+

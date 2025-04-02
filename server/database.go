@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 
@@ -13,7 +14,7 @@ type Student struct {
 	StudentID   string
 	StudentName string
 	Course      string
-	CreatedDate string
+	LastUpdate  string
 }
 
 type Database struct {
@@ -33,9 +34,14 @@ func NewDatabase() (*Database, error) {
 		password = os.Getenv("PASSWORD")
 		dbname   = os.Getenv("DBNAME")
 	)
+
 	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, dbname)
 
 	db, err := sql.Open("postgres", connectionString)
+
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	return &Database{db: db}, nil
 }
@@ -67,7 +73,7 @@ func (d *Database) CreateStudent(studentID string, studentName string, course st
 }
 
 func (d *Database) GetAllStudents() ([]Student, error) {
-	rows, err := d.db.Query("SELECT id, name, course, created_date FROM my_student")
+	rows, err := d.db.Query("SELECT id, name, course, last_update FROM my_student")
 
 	if err != nil {
 		return nil, err
@@ -78,7 +84,7 @@ func (d *Database) GetAllStudents() ([]Student, error) {
 
 	for rows.Next() {
 		var student Student
-		if err := rows.Scan(&student.StudentID, &student.StudentName, &student.Course, &student.CreatedDate); err != nil {
+		if err := rows.Scan(&student.StudentID, &student.StudentName, &student.Course, &student.LastUpdate); err != nil {
 			return nil, err
 		}
 		students = append(students, student)
@@ -89,7 +95,7 @@ func (d *Database) GetAllStudents() ([]Student, error) {
 }
 
 func (d *Database) GetStudentByID(id string) (*Student, error) {
-	stmt, err := d.db.Prepare("SELECT id, name, course, created_date FROM my_student WHERE id = $1")
+	stmt, err := d.db.Prepare("SELECT id, name, course, last_update FROM my_student WHERE id = $1")
 
 	if err != nil {
 		return nil, err
@@ -100,9 +106,60 @@ func (d *Database) GetStudentByID(id string) (*Student, error) {
 	var student Student
 
 	row := stmt.QueryRow(id)
-	if err := row.Scan(&student.StudentID, &student.StudentName, &student.Course, &student.CreatedDate); err != nil {
+	if err := row.Scan(&student.StudentID, &student.StudentName, &student.Course, &student.LastUpdate); err != nil {
 		return nil, err
 	}
 
 	return &student, nil
+}
+
+func (d *Database) UpdateStudentById(id string, newId string, name string, course string) error {
+	stmt, err := d.db.Prepare("UPDATE my_student SET id = $2, name = $3, course = $4 WHERE id = $1 AND EXISTS (SELECT id FROM my_student WHERE id = $1) RETURNING id")
+
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	var updatedID string
+	err = stmt.QueryRow(id, newId, name, course).Scan(&updatedID)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("Student with ID not found")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (d *Database) DeleteStudentById(id string) error {
+	stmt, err := d.db.Prepare(`
+		DELETE FROM my_student WHERE
+		id = $1
+	`)
+
+	if err != nil {
+		return err
+	}
+
+	result, err := stmt.Exec(id)
+
+	if err != nil {
+		return err
+	}
+
+	row, err := result.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if row == 0 {
+		return errors.New("student not exist")
+	}
+
+	return nil
 }

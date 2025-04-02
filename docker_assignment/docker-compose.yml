@@ -2,25 +2,14 @@ version: '3.8'
 
 services:
     postgresql_database:
-        container_name: postgres_container
+        container_name: postgres_docker_assignment_container
         image: postgres:latest
         environment:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=password
-            - POSTGRES_DB=docker_db
+            - POSTGRES_DB=studentdb
         ports: 
             - "5431:5432"
-        restart: always
-
-
-    pgadmin:
-        container_name: pgadmin4_container
-        image: dpage/pgadmin4
-        environment: 
-            - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-            - PGADMIN_DEFAULT_PASSWORD=password
-        ports:
-            - '5050:80'
         restart: always
 
     my-docker-server:
@@ -28,4 +17,11 @@ services:
         image: my-docker-server:latest
         ports:
             - "8080:8080"
+        restart: always
+
+    redis:
+        container_name: docker-assignment-redis
+        image: redis
+        ports:
+            - '6379:6379'
         restart: always
